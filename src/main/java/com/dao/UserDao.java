@@ -1,13 +1,7 @@
 package com.dao;
 
-import javax.servlet.http.HttpSession;
-
 import com.entity.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 
 public class UserDao {
     private EntityManagerFactory emf;
@@ -38,22 +32,39 @@ public class UserDao {
 
         return f;
     }
-    
-    public User login(String email, String password) {
-    	User u = null;
-    	 EntityManager em = emf.createEntityManager();
-    	 try {
-    	        Query q = em.createQuery("from User where email = :em and password = :ps");
-    	        q.setParameter("em", email);
-    	        q.setParameter("ps", password);
 
-    	        u = (User) q.getSingleResult();
-    	    } catch (Exception e) {
-    	        e.printStackTrace(); 
-    	    } finally {
-    	        em.close();
-    	    }
-    	 
-    	return u;
+    public User login(String email, String password) {
+        User u = null;
+        EntityManager em = emf.createEntityManager();
+        try {
+            Query q = em.createQuery("from User where email = :em and password = :ps");
+            q.setParameter("em", email);
+            q.setParameter("ps", password);
+            u = (User) q.getSingleResult();
+        } catch (NoResultException e) {
+            e.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace(); 
+        } finally {
+            em.close();
+        }
+        return u;
+    }
+
+    public User getUserByEmail(String email) {
+        EntityManager em = emf.createEntityManager();
+        User u = null;
+        try {
+            Query q = em.createQuery("from User where email = :em");
+            q.setParameter("em", email);
+            u = (User) q.getSingleResult();
+        } catch (NoResultException e) {
+            e.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+        return u;
     }
 }
